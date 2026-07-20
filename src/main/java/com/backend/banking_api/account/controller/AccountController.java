@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.backend.banking_api.account.entity.Account;
@@ -21,16 +22,18 @@ import jakarta.validation.Valid;
 @RestController
 @RequestMapping("/api")
 public class AccountController {
+
     private final AccountService accountService;
 
     public AccountController(AccountService accountService) {
         this.accountService = accountService;
     }
 
-    @PostMapping("/branches/{branchId}/accounts")
-    public ResponseEntity<Account> create(@PathVariable Long branchId,
-            @Valid @RequestBody Account account) {
-        Account created = accountService.createForBranch(branchId, account);
+    @PostMapping("/customers/{customerId}/accounts")
+    public ResponseEntity<Account> create(@PathVariable Long customerId,
+                                          @RequestParam Long branchId,
+                                          @Valid @RequestBody Account account) {
+        Account created = accountService.create(branchId, customerId, account);
         return ResponseEntity.status(HttpStatus.CREATED).body(created);
     }
 
@@ -49,9 +52,14 @@ public class AccountController {
         return ResponseEntity.ok(accountService.findByBranchId(branchId));
     }
 
+    @GetMapping("/customers/{customerId}/accounts")
+    public ResponseEntity<List<Account>> findByCustomerId(@PathVariable Long customerId) {
+        return ResponseEntity.ok(accountService.findByCustomerId(customerId));
+    }
+
     @PutMapping("/accounts/{id}")
     public ResponseEntity<Account> update(@PathVariable Long id,
-            @Valid @RequestBody Account account) {
+                                          @Valid @RequestBody Account account) {
         return ResponseEntity.ok(accountService.update(id, account));
     }
 

@@ -6,6 +6,7 @@ import com.backend.banking_api.account.enums.AccountStatus;
 import com.backend.banking_api.account.enums.AccountType;
 import com.backend.banking_api.branch.entity.Branch;
 import com.backend.banking_api.common.base.BaseEntity;
+import com.backend.banking_api.customer.entity.Customer;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import jakarta.persistence.Column;
@@ -45,6 +46,11 @@ public class Account extends BaseEntity {
     @JsonIgnore
     private Branch branch;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "customer_id", nullable = false)
+    @JsonIgnore
+    private Customer customer;
+
     public Account() {
 
     }
@@ -76,6 +82,10 @@ public class Account extends BaseEntity {
         return branch;
     }
 
+    public Customer getCustomer() {
+        return customer;
+    }
+
     public void setAccountNumber(String accountNumber) {
         this.accountNumber = accountNumber;
     }
@@ -94,6 +104,10 @@ public class Account extends BaseEntity {
 
     public void setBranch(Branch branch) {
         this.branch = branch;
+    }
+
+    public void setCustomer(Customer customer) {
+        this.customer = customer;
     }
 
 }

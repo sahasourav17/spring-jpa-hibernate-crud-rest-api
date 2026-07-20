@@ -1,5 +1,9 @@
 package com.backend.banking_api.customer.entity;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import com.backend.banking_api.account.entity.Account;
 import com.backend.banking_api.card.entity.Card;
 import com.backend.banking_api.common.base.BaseEntity;
 
@@ -7,6 +11,7 @@ import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.Email;
@@ -42,6 +47,8 @@ public class Customer extends BaseEntity{
     @OneToOne(mappedBy = "customer", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
     private Card card;
 
+    @OneToMany(mappedBy = "customer", fetch = FetchType.LAZY)
+    private List<Account> accounts = new ArrayList<>();
 
     public Customer() {
     }
@@ -95,6 +102,19 @@ public class Customer extends BaseEntity{
         if (card != null) {
             card.setCustomer(this);
         }
+    }
+
+    public List<Account> getAccounts() {
+        return accounts;
+    }
+
+    public void setAccounts(List<Account> accounts) {
+        this.accounts = accounts;
+    }
+
+    public void addAccount(Account account) {
+        accounts.add(account);
+        account.setCustomer(this);
     }
 
 }

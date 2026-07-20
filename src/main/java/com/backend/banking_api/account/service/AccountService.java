@@ -10,28 +10,41 @@ import com.backend.banking_api.account.enums.AccountStatus;
 import com.backend.banking_api.account.repository.AccountRepository;
 import com.backend.banking_api.branch.entity.Branch;
 import com.backend.banking_api.branch.repository.BranchRepository;
+import com.backend.banking_api.customer.entity.Customer;
+import com.backend.banking_api.customer.repository.CustomerRepository;
 
 @Service
 public class AccountService {
 
     private final AccountRepository accountRepository;
     private final BranchRepository branchRepository;
+    private final CustomerRepository customerRepository;
 
-    public AccountService(AccountRepository accountRepository, BranchRepository branchRepository) {
+    public AccountService(AccountRepository accountRepository,
+                          BranchRepository branchRepository,
+                          CustomerRepository customerRepository) {
         this.accountRepository = accountRepository;
         this.branchRepository = branchRepository;
+        this.customerRepository = customerRepository;
     }
 
-    public Account createForBranch(Long branchId, Account account) {
+    public Account create(Long branchId, Long customerId, Account account) {
         Branch branch = branchRepository.findById(branchId)
-                .orElseThrow(() -> new RuntimeException("Branch not found"));
+                .orElseThrow(() -> new RuntimeException("Branch not found with id: " + branchId));
+
+        Customer customer = customerRepository.findById(customerId)
+                .orElseThrow(() -> new RuntimeException("Customer not found with id: " + customerId));
+
         if (account.getBalance() == null) {
             account.setBalance(BigDecimal.ZERO);
         }
         if (account.getStatus() == null) {
             account.setStatus(AccountStatus.ACTIVE);
         }
+
         account.setBranch(branch);
+        account.setCustomer(customer);
+
         return accountRepository.save(account);
     }
 
@@ -51,11 +64,20 @@ public class AccountService {
         return accountRepository.findByBranchId(branchId);
     }
 
-    public Account update(Long id, Account account) {
+    public List<Account> findByCustomerId(Long customerId) {
+        if (!customerRepository.existsById(customerId)) {
+            throw new RuntimeException("Customer not found with id: " + customerId);
+        }
+        return accountRepository.findByCustomerId(customerId);
+    }
+
+    public Account update(Long id, Account updated) {
         Account existing = findById(id);
-        existing.setAccountNumber(account.getAccountNumber());
-        existing.setAccountType(account.getAccountType());
-        existing.setStatus(account.getStatus());
+
+        existing.setAccountNumber(updated.getAccountNumber());
+        existing.setAccountType(updated.getAccountType());
+        existing.setStatus(updated.getStatus());
+
         return accountRepository.save(existing);
     }
 
@@ -65,5 +87,4 @@ public class AccountService {
         }
         accountRepository.deleteById(id);
     }
-
 }
