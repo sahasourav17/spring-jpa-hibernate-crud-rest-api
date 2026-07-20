@@ -1,9 +1,13 @@
 package com.backend.banking_api.customer.entity;
 
+import com.backend.banking_api.card.entity.Card;
 import com.backend.banking_api.common.base.BaseEntity;
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
@@ -34,6 +38,9 @@ public class Customer extends BaseEntity{
     @Pattern(regexp = "^\\d{11}$", message = "Invalid phone number")
     @Column(name = "phone", nullable = false, length = 15)
     private String phone;
+
+    @OneToOne(mappedBy = "customer", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
+    private Card card;
 
 
     public Customer() {
@@ -77,6 +84,17 @@ public class Customer extends BaseEntity{
 
     public void setPhone(String phone) {
         this.phone = phone;
+    }
+
+    public Card getCard() {
+        return card;
+    }
+
+    public void setCard(Card card) {
+        this.card = card;
+        if (card != null) {
+            card.setCustomer(this);
+        }
     }
 
 }
