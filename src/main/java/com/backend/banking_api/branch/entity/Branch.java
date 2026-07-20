@@ -1,9 +1,16 @@
 package com.backend.banking_api.branch.entity;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import com.backend.banking_api.account.entity.Account;
 import com.backend.banking_api.common.base.BaseEntity;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 
 @Entity
@@ -21,6 +28,9 @@ public class Branch extends BaseEntity {
 
     @Column(name = "city", nullable = false)
     private String city;
+
+    @OneToMany(mappedBy = "branch", fetch = FetchType.LAZY)
+    private List<Account> accounts = new ArrayList<>();
 
     // no arg constructor
     public Branch() {
@@ -65,5 +75,18 @@ public class Branch extends BaseEntity {
 
     public void setCity(String city) {
         this.city = city;
+    }
+
+    public List<Account> getAccounts() {
+        return accounts;
+    }
+
+    public void setAccounts(List<Account> accounts) {
+        this.accounts = accounts;
+    }
+
+    public void addAccount(Account account) {
+        accounts.add(account);
+        account.setBranch(this);
     }
 }
