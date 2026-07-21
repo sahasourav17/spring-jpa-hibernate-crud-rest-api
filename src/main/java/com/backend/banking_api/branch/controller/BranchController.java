@@ -12,8 +12,13 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.backend.banking_api.branch.entity.Branch;
+import com.backend.banking_api.branch.dto.BranchResponse;
+import com.backend.banking_api.branch.dto.CreateBranchRequest;
+import com.backend.banking_api.branch.dto.UpdateBranchRequest;
 import com.backend.banking_api.branch.service.BranchService;
+
+import jakarta.validation.Valid;
+
 import org.springframework.web.bind.annotation.PutMapping;
 
 
@@ -29,29 +34,29 @@ public class BranchController {
 
     // create branch
     @PostMapping
-    public ResponseEntity<Branch> createBranch(@RequestBody Branch branch) {
-        Branch createdBranch = branchService.create(branch);
+    public ResponseEntity<BranchResponse> createBranch(@Valid @RequestBody CreateBranchRequest request) {
+        BranchResponse createdBranch = branchService.create(request);
         return ResponseEntity.status(HttpStatus.CREATED).body(createdBranch);
     }
 
     // get all branches
     @GetMapping
-    public ResponseEntity<List<Branch>> getAllBranches() {
-        List<Branch> branches = branchService.findAll();
+    public ResponseEntity<List<BranchResponse>> getAllBranches() {
+        List<BranchResponse> branches = branchService.findAll();
         return ResponseEntity.ok(branches);
     }
 
     // get branch by id
     @GetMapping("/{id}")
-    public ResponseEntity<Branch> getBranchById(@PathVariable Long id) {
-        Branch branch = branchService.findById(id);
+    public ResponseEntity<BranchResponse> getBranchById(@PathVariable Long id) {
+        BranchResponse branch = branchService.findById(id);
         return ResponseEntity.ok(branch);
     }
 
     // update branch
     @PutMapping("/{id}")
-    public ResponseEntity<Branch> updateBranch(@PathVariable Long id, @RequestBody Branch updatedBranch) {
-        Branch updatedBranchResult = branchService.update(id, updatedBranch);
+    public ResponseEntity<BranchResponse> updateBranch(@PathVariable Long id, @Valid @RequestBody UpdateBranchRequest request) {
+        BranchResponse updatedBranchResult = branchService.update(id, request);
         return ResponseEntity.ok(updatedBranchResult);
     }
 

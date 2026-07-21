@@ -4,6 +4,9 @@ import java.util.List;
 
 import org.springframework.stereotype.Service;
 
+import com.backend.banking_api.branch.dto.BranchResponse;
+import com.backend.banking_api.branch.dto.CreateBranchRequest;
+import com.backend.banking_api.branch.dto.UpdateBranchRequest;
 import com.backend.banking_api.branch.entity.Branch;
 import com.backend.banking_api.branch.repository.BranchRepository;
 
@@ -16,33 +19,42 @@ public class BranchService {
         this.branchRepository = branchRepository;
     }
 
-    // create branch
-    public Branch create(Branch branch) {
-        return branchRepository.save(branch);
+    public BranchResponse create(CreateBranchRequest request) {
+        Branch branch = new Branch();
+        branch.setName(request.getName());
+        branch.setBranchCode(request.getBranchCode());
+        branch.setCity(request.getCity());
+        branch.setAddress(request.getAddress());
+
+        Branch saved = branchRepository.save(branch);
+        return toResponse(saved);
     }
 
-    // get all branches
-    public List<Branch> findAll() {
-        return branchRepository.findAll();
+    public List<BranchResponse> findAll() {
+        return branchRepository.findAll().stream()
+                .map(this::toResponse)
+                .toList();
     }
 
-    // get branch by id
-    public Branch findById(Long id) {
-        return branchRepository.findById(id)
-            .orElseThrow(() -> new RuntimeException("Branch not found with id: " + id));
+    public BranchResponse findById(Long id) {
+        Branch branch = branchRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Branch not found with id: " + id));
+        return toResponse(branch);
     }
 
-    // update branch
-    public Branch update(Long id, Branch updatedBranch) {
-        Branch existingBranch = findById(id);
-        existingBranch.setName(updatedBranch.getName());
-        existingBranch.setBranchCode(updatedBranch.getBranchCode());
-        existingBranch.setAddress(updatedBranch.getAddress());
-        existingBranch.setCity(updatedBranch.getCity());
-        return branchRepository.save(existingBranch);
+    public BranchResponse update(Long id, UpdateBranchRequest request) {
+        Branch existing = branchRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Branch not found with id: " + id));
+
+        existing.setName(request.getName());
+        existing.setBranchCode(request.getBranchCode());
+        existing.setCity(request.getCity());
+        existing.setAddress(request.getAddress());
+
+        Branch saved = branchRepository.save(existing);
+        return toResponse(saved);
     }
 
-    // delete branch
     public void delete(Long id) {
         if (!branchRepository.existsById(id)) {
             throw new RuntimeException("Branch not found with id: " + id);
@@ -50,4 +62,15 @@ public class BranchService {
         branchRepository.deleteById(id);
     }
 
+    private BranchResponse toResponse(Branch branch) {
+        return new BranchResponse(
+                branch.getId(),
+                branch.getName(),
+                branch.getBranchCode(),
+                branch.getCity(),
+                branch.getAddress(),
+                branch.getCreatedAt(),
+                branch.getUpdatedAt()
+        );
+    }
 }
