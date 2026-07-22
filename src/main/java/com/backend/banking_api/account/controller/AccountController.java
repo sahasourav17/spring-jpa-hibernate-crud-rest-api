@@ -14,7 +14,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.backend.banking_api.account.entity.Account;
+import com.backend.banking_api.account.dto.AccountResponse;
+import com.backend.banking_api.account.dto.CreateAccountRequest;
+import com.backend.banking_api.account.dto.UpdateAccountRequest;
 import com.backend.banking_api.account.service.AccountService;
 
 import jakarta.validation.Valid;
@@ -30,37 +32,37 @@ public class AccountController {
     }
 
     @PostMapping("/customers/{customerId}/accounts")
-    public ResponseEntity<Account> create(@PathVariable Long customerId,
-                                          @RequestParam Long branchId,
-                                          @Valid @RequestBody Account account) {
-        Account created = accountService.create(branchId, customerId, account);
+    public ResponseEntity<AccountResponse> create(@PathVariable Long customerId,
+                                                  @RequestParam Long branchId,
+                                                  @Valid @RequestBody CreateAccountRequest request) {
+        AccountResponse created = accountService.create(branchId, customerId, request);
         return ResponseEntity.status(HttpStatus.CREATED).body(created);
     }
 
     @GetMapping("/accounts")
-    public ResponseEntity<List<Account>> findAll() {
+    public ResponseEntity<List<AccountResponse>> findAll() {
         return ResponseEntity.ok(accountService.findAll());
     }
 
     @GetMapping("/accounts/{id}")
-    public ResponseEntity<Account> findById(@PathVariable Long id) {
+    public ResponseEntity<AccountResponse> findById(@PathVariable Long id) {
         return ResponseEntity.ok(accountService.findById(id));
     }
 
     @GetMapping("/branches/{branchId}/accounts")
-    public ResponseEntity<List<Account>> findByBranchId(@PathVariable Long branchId) {
+    public ResponseEntity<List<AccountResponse>> findByBranchId(@PathVariable Long branchId) {
         return ResponseEntity.ok(accountService.findByBranchId(branchId));
     }
 
     @GetMapping("/customers/{customerId}/accounts")
-    public ResponseEntity<List<Account>> findByCustomerId(@PathVariable Long customerId) {
+    public ResponseEntity<List<AccountResponse>> findByCustomerId(@PathVariable Long customerId) {
         return ResponseEntity.ok(accountService.findByCustomerId(customerId));
     }
 
     @PutMapping("/accounts/{id}")
-    public ResponseEntity<Account> update(@PathVariable Long id,
-                                          @Valid @RequestBody Account account) {
-        return ResponseEntity.ok(accountService.update(id, account));
+    public ResponseEntity<AccountResponse> update(@PathVariable Long id,
+                                                  @Valid @RequestBody UpdateAccountRequest request) {
+        return ResponseEntity.ok(accountService.update(id, request));
     }
 
     @DeleteMapping("/accounts/{id}")

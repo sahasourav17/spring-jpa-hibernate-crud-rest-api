@@ -13,7 +13,9 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.backend.banking_api.transaction.entity.Transaction;
+import com.backend.banking_api.transaction.dto.CreateTransactionRequest;
+import com.backend.banking_api.transaction.dto.TransactionResponse;
+import com.backend.banking_api.transaction.dto.UpdateTransactionRequest;
 import com.backend.banking_api.transaction.service.TransactionService;
 
 import jakarta.validation.Valid;
@@ -29,31 +31,31 @@ public class TransactionController {
     }
 
     @PostMapping("/accounts/{accountId}/transactions")
-    public ResponseEntity<Transaction> create(@PathVariable Long accountId,
-                                              @Valid @RequestBody Transaction transaction) {
-        Transaction created = transactionService.createForAccount(accountId, transaction);
+    public ResponseEntity<TransactionResponse> create(@PathVariable Long accountId,
+                                                      @Valid @RequestBody CreateTransactionRequest request) {
+        TransactionResponse created = transactionService.createForAccount(accountId, request);
         return ResponseEntity.status(HttpStatus.CREATED).body(created);
     }
 
     @GetMapping("/transactions")
-    public ResponseEntity<List<Transaction>> findAll() {
+    public ResponseEntity<List<TransactionResponse>> findAll() {
         return ResponseEntity.ok(transactionService.findAll());
     }
 
     @GetMapping("/transactions/{id}")
-    public ResponseEntity<Transaction> findById(@PathVariable Long id) {
+    public ResponseEntity<TransactionResponse> findById(@PathVariable Long id) {
         return ResponseEntity.ok(transactionService.findById(id));
     }
 
     @GetMapping("/accounts/{accountId}/transactions")
-    public ResponseEntity<List<Transaction>> findByAccountId(@PathVariable Long accountId) {
+    public ResponseEntity<List<TransactionResponse>> findByAccountId(@PathVariable Long accountId) {
         return ResponseEntity.ok(transactionService.findByAccountId(accountId));
     }
 
     @PutMapping("/transactions/{id}")
-    public ResponseEntity<Transaction> update(@PathVariable Long id,
-                                              @Valid @RequestBody Transaction transaction) {
-        return ResponseEntity.ok(transactionService.update(id, transaction));
+    public ResponseEntity<TransactionResponse> update(@PathVariable Long id,
+                                                      @Valid @RequestBody UpdateTransactionRequest request) {
+        return ResponseEntity.ok(transactionService.update(id, request));
     }
 
     @DeleteMapping("/transactions/{id}")

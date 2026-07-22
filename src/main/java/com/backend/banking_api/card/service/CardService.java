@@ -4,6 +4,9 @@ import java.util.List;
 
 import org.springframework.stereotype.Service;
 
+import com.backend.banking_api.card.dto.CardResponse;
+import com.backend.banking_api.card.dto.CreateCardRequest;
+import com.backend.banking_api.card.dto.UpdateCardRequest;
 import com.backend.banking_api.card.entity.Card;
 import com.backend.banking_api.card.repository.CardRepository;
 import com.backend.banking_api.customer.entity.Customer;
@@ -20,40 +23,55 @@ public class CardService {
         this.customerRepository = customerRepository;
     }
 
-    public Card createForCustomer(Long customerId, Card card) {
+    public CardResponse createForCustomer(Long customerId, CreateCardRequest request) {
         Customer customer = customerRepository.findById(customerId)
-                .orElseThrow(() -> new RuntimeException("Customer not found"));
+                .orElseThrow(() -> new RuntimeException("Customer not found with id: " + customerId));
 
         if (customer.getCard() != null) {
             throw new RuntimeException("Customer already has a card");
         }
 
+        Card card = new Card();
+        card.setCardNumber(request.getCardNumber());
+        card.setExpiryDate(request.getExpiryDate());
+        card.setCvv(request.getCvv());
+        card.setActive(request.getActive() != null ? request.getActive() : true);
+
         customer.setCard(card);
         customerRepository.save(customer);
-        return card;
+
+        return toResponse(card);
     }
 
-    public List<Card> findAll() {
-        return cardRepository.findAll();
+    public List<CardResponse> findAll() {
+        return cardRepository.findAll().stream()
+                .map(this::toResponse)
+                .toList();
     }
 
-    public Card findById(Long id) {
-        return cardRepository.findById(id)
+    public CardResponse findById(Long id) {
+        Card card = cardRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Card not found with id: " + id));
+        return toResponse(card);
     }
 
-    public Card findByCustomerId(Long customerId) {
-        return cardRepository.findByCustomerId(customerId)
+    public CardResponse findByCustomerId(Long customerId) {
+        Card card = cardRepository.findByCustomerId(customerId)
                 .orElseThrow(() -> new RuntimeException("Card not found for customer id: " + customerId));
+        return toResponse(card);
     }
 
-    public Card update(Long id, Card updated) {
-        Card existing = findById(id);
-        existing.setCardNumber(updated.getCardNumber());
-        existing.setExpiryDate(updated.getExpiryDate());
-        existing.setCvv(updated.getCvv());
-        existing.setActive(updated.getActive());
-        return cardRepository.save(existing);
+    public CardResponse update(Long id, UpdateCardRequest request) {
+        Card existing = cardRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Card not found with id: " + id));
+
+        existing.setCardNumber(request.getCardNumber());
+        existing.setExpiryDate(request.getExpiryDate());
+        existing.setCvv(request.getCvv());
+        existing.setActive(request.getActive());
+
+        Card saved = cardRepository.save(existing);
+        return toResponse(saved);
     }
 
     public void delete(Long id) {
@@ -61,5 +79,19 @@ public class CardService {
             throw new RuntimeException("Card not found with id: " + id);
         }
         cardRepository.deleteById(id);
+    }
+
+    private CardResponse toResponse(Card card) {
+        Long customerId = card.getCustomer() != null ? card.getCustomer().getId() : null;
+        return new CardResponse(
+                card.getId(),
+                card.getCardNumber(),
+                card.getExpiryDate(),
+                card.getCvv(),
+                card.getActive(),
+                customerId,
+                card.getCreatedAt(),
+                card.getUpdatedAt()
+        );
     }
 }
