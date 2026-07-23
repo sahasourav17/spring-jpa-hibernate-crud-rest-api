@@ -2,6 +2,8 @@ package com.backend.banking_api.branch.service;
 
 import java.util.List;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import com.backend.banking_api.branch.dto.BranchResponse;
@@ -30,10 +32,8 @@ public class BranchService {
         return toResponse(saved);
     }
 
-    public List<BranchResponse> findAll() {
-        return branchRepository.findAll().stream()
-                .map(this::toResponse)
-                .toList();
+    public Page<BranchResponse> findAll(Pageable pageable) {
+        return branchRepository.findAll(pageable).map(this::toResponse);
     }
 
     public BranchResponse findById(Long id) {

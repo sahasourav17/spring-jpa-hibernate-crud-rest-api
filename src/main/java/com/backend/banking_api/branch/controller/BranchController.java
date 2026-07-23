@@ -1,7 +1,9 @@
 package com.backend.banking_api.branch.controller;
 
-import java.util.List;
-
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -20,7 +22,6 @@ import com.backend.banking_api.branch.service.BranchService;
 import jakarta.validation.Valid;
 
 import org.springframework.web.bind.annotation.PutMapping;
-
 
 @RestController
 @RequestMapping("/api/branches")
@@ -41,8 +42,9 @@ public class BranchController {
 
     // get all branches
     @GetMapping
-    public ResponseEntity<List<BranchResponse>> getAllBranches() {
-        List<BranchResponse> branches = branchService.findAll();
+    public ResponseEntity<Page<BranchResponse>> getAllBranches(
+            @PageableDefault(size = 10, sort = "id", direction = Sort.Direction.ASC) Pageable pageable) {
+        Page<BranchResponse> branches = branchService.findAll(pageable);
         return ResponseEntity.ok(branches);
     }
 
@@ -55,7 +57,8 @@ public class BranchController {
 
     // update branch
     @PutMapping("/{id}")
-    public ResponseEntity<BranchResponse> updateBranch(@PathVariable Long id, @Valid @RequestBody UpdateBranchRequest request) {
+    public ResponseEntity<BranchResponse> updateBranch(@PathVariable Long id,
+            @Valid @RequestBody UpdateBranchRequest request) {
         BranchResponse updatedBranchResult = branchService.update(id, request);
         return ResponseEntity.ok(updatedBranchResult);
     }
