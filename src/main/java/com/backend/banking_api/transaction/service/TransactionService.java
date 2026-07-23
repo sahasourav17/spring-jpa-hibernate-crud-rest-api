@@ -1,7 +1,7 @@
 package com.backend.banking_api.transaction.service;
 
-import java.util.List;
-
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import com.backend.banking_api.account.entity.Account;
@@ -39,10 +39,8 @@ public class TransactionService {
         return toResponse(saved);
     }
 
-    public List<TransactionResponse> findAll() {
-        return transactionRepository.findAll().stream()
-                .map(this::toResponse)
-                .toList();
+    public Page<TransactionResponse> findAll(Pageable pageable) {
+        return transactionRepository.findAll(pageable).map(this::toResponse);
     }
 
     public TransactionResponse findById(Long id) {
@@ -51,13 +49,11 @@ public class TransactionService {
         return toResponse(transaction);
     }
 
-    public List<TransactionResponse> findByAccountId(Long accountId) {
+    public Page<TransactionResponse> findByAccountId(Long accountId, Pageable pageable) {
         if (!accountRepository.existsById(accountId)) {
             throw new RuntimeException("Account not found with id: " + accountId);
         }
-        return transactionRepository.findByAccountId(accountId).stream()
-                .map(this::toResponse)
-                .toList();
+        return transactionRepository.findByAccountId(accountId, pageable).map(this::toResponse);
     }
 
     public TransactionResponse update(Long id, UpdateTransactionRequest request) {

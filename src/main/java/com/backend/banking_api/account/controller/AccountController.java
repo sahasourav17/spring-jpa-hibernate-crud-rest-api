@@ -1,7 +1,9 @@
 package com.backend.banking_api.account.controller;
 
-import java.util.List;
-
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -40,8 +42,9 @@ public class AccountController {
     }
 
     @GetMapping("/accounts")
-    public ResponseEntity<List<AccountResponse>> findAll() {
-        return ResponseEntity.ok(accountService.findAll());
+    public ResponseEntity<Page<AccountResponse>> findAll(
+            @PageableDefault(size = 10, sort = "id", direction = Sort.Direction.ASC) Pageable pageable) {
+        return ResponseEntity.ok(accountService.findAll(pageable));
     }
 
     @GetMapping("/accounts/{id}")
@@ -50,13 +53,17 @@ public class AccountController {
     }
 
     @GetMapping("/branches/{branchId}/accounts")
-    public ResponseEntity<List<AccountResponse>> findByBranchId(@PathVariable Long branchId) {
-        return ResponseEntity.ok(accountService.findByBranchId(branchId));
+    public ResponseEntity<Page<AccountResponse>> findByBranchId(
+            @PathVariable Long branchId,
+            @PageableDefault(size = 10, sort = "id", direction = Sort.Direction.ASC) Pageable pageable) {
+        return ResponseEntity.ok(accountService.findByBranchId(branchId, pageable));
     }
 
     @GetMapping("/customers/{customerId}/accounts")
-    public ResponseEntity<List<AccountResponse>> findByCustomerId(@PathVariable Long customerId) {
-        return ResponseEntity.ok(accountService.findByCustomerId(customerId));
+    public ResponseEntity<Page<AccountResponse>> findByCustomerId(
+            @PathVariable Long customerId,
+            @PageableDefault(size = 10, sort = "id", direction = Sort.Direction.ASC) Pageable pageable) {
+        return ResponseEntity.ok(accountService.findByCustomerId(customerId, pageable));
     }
 
     @PutMapping("/accounts/{id}")

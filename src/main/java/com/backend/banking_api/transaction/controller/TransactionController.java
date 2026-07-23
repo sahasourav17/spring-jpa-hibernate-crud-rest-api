@@ -1,7 +1,9 @@
 package com.backend.banking_api.transaction.controller;
 
-import java.util.List;
-
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -38,8 +40,9 @@ public class TransactionController {
     }
 
     @GetMapping("/transactions")
-    public ResponseEntity<List<TransactionResponse>> findAll() {
-        return ResponseEntity.ok(transactionService.findAll());
+    public ResponseEntity<Page<TransactionResponse>> findAll(
+            @PageableDefault(size = 10, sort = "id", direction = Sort.Direction.ASC) Pageable pageable) {
+        return ResponseEntity.ok(transactionService.findAll(pageable));
     }
 
     @GetMapping("/transactions/{id}")
@@ -48,8 +51,10 @@ public class TransactionController {
     }
 
     @GetMapping("/accounts/{accountId}/transactions")
-    public ResponseEntity<List<TransactionResponse>> findByAccountId(@PathVariable Long accountId) {
-        return ResponseEntity.ok(transactionService.findByAccountId(accountId));
+    public ResponseEntity<Page<TransactionResponse>> findByAccountId(
+            @PathVariable Long accountId,
+            @PageableDefault(size = 10, sort = "id", direction = Sort.Direction.ASC) Pageable pageable) {
+        return ResponseEntity.ok(transactionService.findByAccountId(accountId, pageable));
     }
 
     @PutMapping("/transactions/{id}")

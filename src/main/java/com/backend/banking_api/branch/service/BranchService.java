@@ -1,7 +1,5 @@
 package com.backend.banking_api.branch.service;
 
-import java.util.List;
-
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;

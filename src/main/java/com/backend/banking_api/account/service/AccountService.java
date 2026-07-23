@@ -1,8 +1,9 @@
 package com.backend.banking_api.account.service;
 
 import java.math.BigDecimal;
-import java.util.List;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import com.backend.banking_api.account.dto.AccountResponse;
@@ -50,10 +51,8 @@ public class AccountService {
         return toResponse(saved);
     }
 
-    public List<AccountResponse> findAll() {
-        return accountRepository.findAll().stream()
-                .map(this::toResponse)
-                .toList();
+    public Page<AccountResponse> findAll(Pageable pageable) {
+        return accountRepository.findAll(pageable).map(this::toResponse);
     }
 
     public AccountResponse findById(Long id) {
@@ -62,22 +61,18 @@ public class AccountService {
         return toResponse(account);
     }
 
-    public List<AccountResponse> findByBranchId(Long branchId) {
+    public Page<AccountResponse> findByBranchId(Long branchId, Pageable pageable) {
         if (!branchRepository.existsById(branchId)) {
             throw new RuntimeException("Branch not found with id: " + branchId);
         }
-        return accountRepository.findByBranchId(branchId).stream()
-                .map(this::toResponse)
-                .toList();
+        return accountRepository.findByBranchId(branchId, pageable).map(this::toResponse);
     }
 
-    public List<AccountResponse> findByCustomerId(Long customerId) {
+    public Page<AccountResponse> findByCustomerId(Long customerId, Pageable pageable) {
         if (!customerRepository.existsById(customerId)) {
             throw new RuntimeException("Customer not found with id: " + customerId);
         }
-        return accountRepository.findByCustomerId(customerId).stream()
-                .map(this::toResponse)
-                .toList();
+        return accountRepository.findByCustomerId(customerId, pageable).map(this::toResponse);
     }
 
     public AccountResponse update(Long id, UpdateAccountRequest request) {

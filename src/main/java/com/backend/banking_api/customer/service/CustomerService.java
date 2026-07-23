@@ -1,7 +1,7 @@
 package com.backend.banking_api.customer.service;
 
-import java.util.List;
-
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import com.backend.banking_api.customer.dto.CreateCustomerRequest;
@@ -30,10 +30,8 @@ public class CustomerService {
         return toResponse(saved);
     }
 
-    public List<CustomerResponse> findAll() {
-        return customerRepository.findAll().stream()
-                .map(this::toResponse)
-                .toList();
+    public Page<CustomerResponse> findAll(Pageable pageable) {
+        return customerRepository.findAll(pageable).map(this::toResponse);
     }
 
     public CustomerResponse findById(Long id) {
